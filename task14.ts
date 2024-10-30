@@ -1,13 +1,9 @@
-// Bank Account Manager:
-
-// Define a BankAccount class with properties accountNumber, balance, and accountHolder.
-// Use getters and setters for the balance to control deposits and withdrawals.
-// Add an enum for account types like Checking, Savings, Business.
 enum AccountType {
   Checking = "Checking",
   Savings = "Savings",
   Business = "Business",
 }
+
 class BankAccount {
   constructor(
     public accountNumber: number,
@@ -15,21 +11,64 @@ class BankAccount {
     public accountHolder: string,
     public accountType: AccountType
   ) {}
-  setBalance(amount: number): void {
-    this._balance = amount;
-  }
-  getBalance(): number {
+
+  get balance(): number {
     return this._balance;
   }
+
+  set balance(amount: number) {
+    if (amount >= 0) {
+      this._balance = amount;
+    } else {
+      throw new Error("Balance cannot be negative");
+    }
+  }
+
+  deposit(amount: number): void {
+    if (amount > 0) {
+      this._balance += amount;
+      console.log(
+        `Successfully deposited ${amount}. New balance: ${this._balance}`
+      );
+    } else {
+      throw new Error("Deposit amount must be positive");
+    }
+  }
+
+  withdraw(amount: number): void {
+    if (amount <= 0) {
+      throw new Error("Withdrawal amount must be positive");
+    }
+    if (amount > this._balance) {
+      throw new Error("Insufficient balance");
+    }
+    this._balance -= amount;
+    console.log(
+      `Successfully withdrew ${amount}. New balance: ${this._balance}`
+    );
+  }
+
+  getAccountInfo(): string {
+    return `
+      Account Holder: ${this.accountHolder}
+      Account Number: ${this.accountNumber}
+      Account Type: ${this.accountType}
+      Current Balance: $${this._balance}
+    `;
+  }
 }
+
 const account1 = new BankAccount(
   123456789,
   1000,
   "John Doe",
   AccountType.Checking
 );
-console.log(account1);
-// This line produces undefined because setBalance() is a void method that doesn't return anything
-console.log(account1.getBalance()); // Move this before the setBalance to see initial balance
-account1.setBalance(2000); // Remove console.log here since it returns void
-console.log(account1);
+
+try {
+  account1.deposit(500);
+  account1.withdraw(200);
+  console.log(account1.getAccountInfo());
+} catch (error) {
+  console.error(error);
+}
